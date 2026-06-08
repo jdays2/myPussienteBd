@@ -21,14 +21,11 @@ const ls = {
   },
 }
 
-function ControlBar() {
-  const audioRef  = useRef<HTMLAudioElement>(null)
-
+function ControlBar({ audioRef }: { audioRef: React.RefObject<HTMLAudioElement> }) {
   const [volume,   setVolume]   = useState(() => ls.get('bd_volume',   0.35))
   const [muted,    setMuted]    = useState(() => ls.get('bd_muted',    false))
   const [trackIdx, setTrackIdx] = useState(() => ls.get('bd_track',    0))
-  const [started,  setStarted]  = useState(false)
-  const [playing,  setPlaying]  = useState(false)
+  const [playing,  setPlaying]  = useState(true)
 
   // Persist to localStorage
   useEffect(() => { ls.set('bd_volume',   volume)   }, [volume])
@@ -39,46 +36,22 @@ function ControlBar() {
   const currentTrack = playlist[trackIdx] ?? playlist[0]
   const hasMultiple  = playlist.length > 1
 
-  const startAudio = useCallback(() => {
-    const audio = audioRef.current
-    if (!audio || started) return
-    const wasPaused = ls.get('bd_paused', false)
-    audio.volume = muted ? 0 : volume
-    if (!wasPaused) {
-      audio.play().then(() => { setStarted(true); setPlaying(true) }).catch(() => {})
-    } else {
-      setStarted(true)
-    }
-  }, [started, volume, muted])
-
-  // Try autoplay immediately on mount; fall back to first interaction
-  useEffect(() => {
-    const audio = audioRef.current
-    if (!audio) return
-    audio.volume = muted ? 0 : volume
-    audio.play().then(() => { setStarted(true); setPlaying(true) }).catch(() => {
-      // Browser blocked autoplay — wait for user interaction
-      window.addEventListener('click',  startAudio, { once: true })
-      window.addEventListener('scroll', startAudio, { once: true })
-    })
-  }, []) // eslint-disable-line react-hooks/exhaustive-deps
-
   useEffect(() => {
     if (audioRef.current) audioRef.current.volume = muted ? 0 : volume
-  }, [volume, muted])
+  }, [volume, muted]) // eslint-disable-line react-hooks/exhaustive-deps
 
-  // When track changes — reload and resume if playing
+  // When track changes — reload src and resume
   useEffect(() => {
     const audio = audioRef.current
     if (!audio) return
+    audio.src = currentTrack.src
     audio.load()
-    if (started && playing) audio.play().then(() => setPlaying(true)).catch(() => {})
+    if (playing) audio.play().then(() => {}).catch(() => {})
   }, [trackIdx]) // eslint-disable-line react-hooks/exhaustive-deps
 
   const togglePlay = () => {
     const audio = audioRef.current
     if (!audio) return
-    if (!started) { startAudio(); return }
     if (playing) { audio.pause(); setPlaying(false) }
     else { audio.play().then(() => setPlaying(true)).catch(() => {}) }
   }
@@ -90,16 +63,27 @@ function ControlBar() {
     const v = parseFloat(e.target.value)
     setVolume(v)
     setMuted(v === 0)
+    if (audioRef.current) audioRef.current.volume = v
   }
 
-  const toggleMute = () => { setMuted(m => !m); startAudio() }
+  const toggleMute = () => {
+    const next = !muted
+    setMuted(next)
+    if (audioRef.current) audioRef.current.volume = next ? 0 : volume
+  }
 
   const volumeIcon = muted || volume === 0 ? '🔇' : volume < 0.4 ? '🔉' : '🔊'
 
+  // Wire onEnded to advance track
+  useEffect(() => {
+    const audio = audioRef.current
+    if (!audio) return
+    audio.addEventListener('ended', nextTrack)
+    return () => audio.removeEventListener('ended', nextTrack)
+  }, [trackIdx]) // eslint-disable-line react-hooks/exhaustive-deps
+
   return (
     <>
-      <audio ref={audioRef} src={currentTrack.src} preload="auto" onEnded={nextTrack} />
-
       <motion.div
         initial={{ opacity: 0, y: 12 }}
         animate={{ opacity: 1, y: 0 }}
@@ -176,7 +160,85 @@ function ControlBar() {
   )
 }
 
-function Site() {
+const BIRTHDAY_DAYS = [{ month: 6, day: 8 }, { month: 6, day: 9 }]
+
+const OTHER_MESSAGES = [
+  { label: '✦  hey you  ✦',  q: 'Came to check\nsomething?',          sub: 'Do you still love your silly boyfriend?',        btn: 'Obviously yes 🙄' },
+  { label: '✦  hi  ✦',       q: 'Did this dummy\ndo something again?', sub: 'Come on... do you still love him?',              btn: 'Fine, yes 💔' },
+  { label: '✦  tell me  ✦',  q: 'Missing him\na little?',              sub: '...it\'s okay if you are.',                      btn: 'Maybe... yes 🥺' },
+  { label: '✦  be honest  ✦',q: 'He\'s annoying\nsometimes, right?',   sub: 'But you still love him, don\'t you?',            btn: 'Ugh, yes 😤' },
+  { label: '✦  needed a reminder?  ✦', q: 'Just checking\nthat you like this guy?', sub: 'No shame in that.', btn: '...yes ♡' },
+  { label: '✦  really?  ✦',  q: 'Not tired\nof him yet?',              sub: 'Somehow he\'s still here.',                      btn: 'Not yet 🤍' },
+  { label: '✦  psst  ✦',     q: 'Want to feel\nsomething today?',      sub: 'Open it. You know you want to.',                 btn: 'Yes, open it ✦' },
+]
+
+function SplashBtn({ onClick, children }: { onClick: () => void; children: React.ReactNode }) {
+  return (
+    <motion.button
+      onClick={onClick}
+      whileHover={{ scale: 1.06 }}
+      whileTap={{ scale: 0.95 }}
+      className="px-10 py-3 rounded-full font-inter text-sm tracking-widest uppercase"
+      style={{
+        background: 'linear-gradient(135deg, rgba(255,107,157,0.25), rgba(255,107,157,0.1))',
+        border: '1px solid rgba(255,107,157,0.4)',
+        color: 'rgba(255,255,255,0.8)',
+      }}
+    >
+      {children}
+    </motion.button>
+  )
+}
+
+function Splash({ onEnter }: { onEnter: () => void }) {
+  const now = new Date()
+  const isBirthday = BIRTHDAY_DAYS.some(d => d.month === now.getMonth() + 1 && d.day === now.getDate())
+  const [msg] = useState(() => OTHER_MESSAGES[Math.floor(Math.random() * OTHER_MESSAGES.length)])
+
+  const label = isBirthday ? '✦  today is the day  ✦' : msg.label
+
+  return (
+    <motion.div
+      className="fixed inset-0 z-[999] flex flex-col items-center justify-center px-6"
+      style={{ background: '#0a0a12' }}
+      exit={{ opacity: 0 }}
+      transition={{ duration: 1.2 }}
+    >
+      <div className="absolute inset-0 pointer-events-none" style={{ background: 'radial-gradient(ellipse 60% 50% at 50% 50%, rgba(255,107,157,0.07) 0%, transparent 70%)' }} />
+
+      <motion.div
+        initial={{ opacity: 0, y: 24 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.3, duration: 1 }}
+        className="text-center select-none relative z-10 max-w-lg"
+      >
+        <p className="text-[#FFD060] text-xs tracking-[0.45em] uppercase mb-10">{label}</p>
+
+        {isBirthday ? (
+          <>
+            <p className="font-dancing text-white mb-3" style={{ fontSize: 'clamp(1.6rem, 5vw, 3rem)' }}>
+              Is this <span className="text-gradient font-playfair italic">Mariel</span>?
+            </p>
+            <p className="font-playfair italic text-white/50 text-lg md:text-xl mb-12">
+              Does she love her boyfriend?
+            </p>
+            <SplashBtn onClick={onEnter}>Yes, so much ♡</SplashBtn>
+          </>
+        ) : (
+          <>
+            <p className="font-dancing text-white mb-3" style={{ fontSize: 'clamp(1.6rem, 5vw, 3rem)', whiteSpace: 'pre-line' }}>
+              {msg.q}
+            </p>
+            <p className="font-playfair italic text-white/50 text-lg md:text-xl mb-12">{msg.sub}</p>
+            <SplashBtn onClick={onEnter}>{msg.btn}</SplashBtn>
+          </>
+        )}
+      </motion.div>
+    </motion.div>
+  )
+}
+
+function Site({ audioRef }: { audioRef: React.RefObject<HTMLAudioElement> }) {
   return (
     <main>
       <Hero />
@@ -186,15 +248,31 @@ function Site() {
       <Finale />
       <Goodbye />
       <BreakUp />
-      <ControlBar />
+      <ControlBar audioRef={audioRef} />
     </main>
   )
 }
 
 export default function App() {
+  const [entered, setEntered] = useState(false)
+  const audioRef = useRef<HTMLAudioElement>(null)
+
+  const handleEnter = () => {
+    const audio = audioRef.current
+    if (audio) {
+      audio.volume = ls.get('bd_volume', 0.35)
+      audio.play().catch(() => {})
+    }
+    setEntered(true)
+  }
+
   return (
     <LangProvider>
-      <Site />
+      <audio ref={audioRef} src={playlist[ls.get('bd_track', 0)]?.src ?? playlist[0].src} preload="auto" />
+      <AnimatePresence>
+        {!entered && <Splash key="splash" onEnter={handleEnter} />}
+      </AnimatePresence>
+      {entered && <Site audioRef={audioRef} />}
     </LangProvider>
   )
 }
