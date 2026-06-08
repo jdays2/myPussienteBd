@@ -69,6 +69,30 @@ function Photo({ src, index }: { src: string; index: number }) {
   )
 }
 
+function NoteBlock({ text }: { text: string }) {
+  const ref = useRef(null)
+  const inView = useInView(ref, { once: true, margin: '-60px' })
+
+  return (
+    <motion.div
+      ref={ref}
+      initial={{ opacity: 0, y: 28 }}
+      animate={inView ? { opacity: 1, y: 0 } : {}}
+      transition={{ duration: 1, delay: 0.2, ease: [0.16, 1, 0.3, 1] }}
+      className="mt-20 max-w-2xl mx-auto text-center"
+    >
+      <div className="w-12 h-px bg-white/10 mx-auto mb-8" />
+      <p
+        className="font-playfair italic text-white/60 text-lg md:text-xl leading-relaxed"
+        style={{ whiteSpace: 'pre-line' }}
+      >
+        {text}
+      </p>
+      <div className="w-12 h-px bg-white/10 mx-auto mt-8" />
+    </motion.div>
+  )
+}
+
 export default function Reasons() {
   const { t } = useLang()
   const r = t.reasons
@@ -101,6 +125,9 @@ export default function Reasons() {
             <Photo key={i} src={src} index={i} />
           ))}
         </div>
+
+        {/* Note below photos */}
+        <NoteBlock text={r.note} />
       </div>
     </section>
   )

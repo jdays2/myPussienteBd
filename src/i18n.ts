@@ -17,6 +17,7 @@ export const t = {
     label: 'my ghurl',
     title: 'She is everything',
     sub: 'Every photo a reminder of how lucky I am',
+    note: 'Sometimes you have a hard time. Sometimes you\'re in a mood. Sometimes you\'re just a little annoying — haha, sorry!\n\nBut if you ever think I\'m mad at you — I\'m not. I promise.\n\nJust look at you. How could anyone stay mad?\nYou\'re beautiful. You\'re radiant. You\'re smart and wonderful.\n\nNo, you\'re not getting rid of me. Not a chance. ♡',
   },
   letter: {
     label: 'a letter for you',
