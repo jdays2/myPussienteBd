@@ -51,14 +51,17 @@ function ControlBar() {
     }
   }, [started, volume, muted])
 
+  // Try autoplay immediately on mount; fall back to first interaction
   useEffect(() => {
-    window.addEventListener('click',  startAudio, { once: true })
-    window.addEventListener('scroll', startAudio, { once: true })
-    return () => {
-      window.removeEventListener('click',  startAudio)
-      window.removeEventListener('scroll', startAudio)
-    }
-  }, [startAudio])
+    const audio = audioRef.current
+    if (!audio) return
+    audio.volume = muted ? 0 : volume
+    audio.play().then(() => { setStarted(true); setPlaying(true) }).catch(() => {
+      // Browser blocked autoplay — wait for user interaction
+      window.addEventListener('click',  startAudio, { once: true })
+      window.addEventListener('scroll', startAudio, { once: true })
+    })
+  }, []) // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
     if (audioRef.current) audioRef.current.volume = muted ? 0 : volume
