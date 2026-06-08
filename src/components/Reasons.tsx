@@ -18,53 +18,84 @@ const PHOTOS = [
   `${BASE}gallery/solo/photo_11_2026-06-08_18-45-35.jpg`,
 ]
 
-const HEARTS = Array.from({ length: 16 }, (_, i) => ({
-  left: `${(i * 6.2 + 3) % 95}%`,
-  size: 12 + (i % 4) * 7,
-  duration: 4.5 + (i % 5) * 1.2,
-  delay: (i * 0.45) % 5,
-  opacity: 0.10 + (i % 3) * 0.06,
+const ROTATIONS = [-3, 1.5, -2, 2.5, -1, 3, -2.5, 1, -1.5, 2, -0.5]
+
+// Background hearts — rise from bottom, behind photos
+const BG_HEARTS = Array.from({ length: 14 }, (_, i) => ({
+  left: `${(i * 7.1 + 3) % 95}%`,
+  size: 10 + (i % 4) * 6,
+  duration: 5 + (i % 5) * 1.3,
+  delay: (i * 0.5) % 5,
+  opacity: 0.08 + (i % 3) * 0.05,
 }))
 
-function FloatingHeart({ left, size, duration, delay, opacity }: typeof HEARTS[0]) {
+// Foreground hearts — float over the grid, more visible
+const FG_HEARTS = Array.from({ length: 8 }, (_, i) => ({
+  left: `${10 + i * 11}%`,
+  top: `${25 + (i % 3) * 22}%`,
+  size: 14 + (i % 3) * 8,
+  duration: 3 + (i % 4) * 0.8,
+  delay: i * 0.6,
+  opacity: 0.18 + (i % 3) * 0.08,
+}))
+
+function BgHeart({ left, size, duration, delay, opacity }: typeof BG_HEARTS[0]) {
   return (
     <motion.div
       className="absolute pointer-events-none select-none text-[#FF6B9D]"
-      style={{ left, bottom: '-5%', fontSize: size, opacity }}
+      style={{ left, bottom: '-5%', fontSize: size, opacity, zIndex: 0 }}
       animate={{ y: '-115vh', opacity: [opacity, opacity * 0.4, 0] }}
       transition={{ duration, delay, repeat: Infinity, ease: 'easeOut' }}
-    >
-      ♡
-    </motion.div>
+    >♡</motion.div>
   )
 }
 
-function Photo({ src, index }: { src: string; index: number }) {
+function FgHeart({ left, top, size, duration, delay, opacity }: typeof FG_HEARTS[0]) {
+  return (
+    <motion.div
+      className="absolute pointer-events-none select-none text-[#FF6B9D]"
+      style={{ left, top, fontSize: size, zIndex: 20 }}
+      animate={{
+        y: [0, -18, 0],
+        opacity: [opacity, opacity * 1.4, opacity],
+        scale: [1, 1.15, 1],
+      }}
+      transition={{ duration, delay, repeat: Infinity, ease: 'easeInOut' }}
+    >♡</motion.div>
+  )
+}
+
+function Polaroid({ src, rotation, delay, index }: {
+  src: string; rotation: number; delay: number; index: number
+}) {
   const ref = useRef(null)
-  const inView = useInView(ref, { once: true, margin: '-40px' })
+  const inView = useInView(ref, { once: true, margin: '-60px' })
+  const fromX = index % 2 === 0 ? -30 : 30
 
   return (
     <motion.div
       ref={ref}
-      initial={{ opacity: 0, y: 24 }}
-      animate={inView ? { opacity: 1, y: 0 } : {}}
-      transition={{ duration: 0.65, delay: index * 0.05, ease: [0.16, 1, 0.3, 1] }}
-      whileHover={{ scale: 1.03, transition: { duration: 0.2 } }}
-      style={{ breakInside: 'avoid', marginBottom: '6px', display: 'block', borderRadius: '4px', overflow: 'hidden' }}
+      variants={{
+        hidden:  { opacity: 0, y: 36, x: fromX, rotate: rotation - 4 },
+        visible: { opacity: 1, y: 0, x: 0, rotate: rotation,
+                   transition: { duration: 0.7, delay, ease: [0.16, 1, 0.3, 1] } },
+        hover:   { scale: 1.1, rotate: 0,
+                   transition: { duration: 0.18, ease: 'easeOut' } },
+      }}
+      initial="hidden"
+      animate={inView ? 'visible' : 'hidden'}
+      whileHover="hover"
+      className="cursor-pointer relative z-10"
+      style={{ transformOrigin: 'center center' }}
     >
-      <img
-        src={src}
-        alt=""
-        loading="lazy"
-        style={{ width: '100%', display: 'block' }}
-      />
-      <motion.div
-        className="absolute inset-0 pointer-events-none"
-        initial={{ opacity: 0 }}
-        whileHover={{ opacity: 1 }}
-        transition={{ duration: 0.2 }}
-        style={{ background: 'linear-gradient(135deg, rgba(255,107,157,0.12), transparent)', position: 'absolute', inset: 0 }}
-      />
+      <div
+        className="bg-white"
+        style={{ padding: '7px', boxShadow: '0 6px 28px rgba(0,0,0,0.55), 0 0 0 1px rgba(255,255,255,0.06)' }}
+      >
+        <div className="w-36 h-40 overflow-hidden">
+          <img src={src} alt="" className="w-full h-full object-cover" loading="lazy" />
+        </div>
+      </div>
     </motion.div>
   )
 }
@@ -82,12 +113,9 @@ function NoteBlock({ text }: { text: string }) {
       className="mt-20 max-w-2xl mx-auto text-center"
     >
       <div className="w-12 h-px bg-white/10 mx-auto mb-8" />
-      <p
-        className="font-playfair italic text-white/60 text-lg md:text-xl leading-relaxed"
+      <p className="font-playfair italic text-white/60 text-lg md:text-xl leading-relaxed"
         style={{ whiteSpace: 'pre-line' }}
-      >
-        {text}
-      </p>
+      >{text}</p>
       <div className="w-12 h-px bg-white/10 mx-auto mt-8" />
     </motion.div>
   )
@@ -101,7 +129,8 @@ export default function Reasons() {
 
   return (
     <section className="py-28 px-6 relative overflow-hidden" style={{ background: '#0d0d18' }}>
-      {HEARTS.map((h, i) => <FloatingHeart key={i} {...h} />)}
+      {/* Background hearts — behind everything */}
+      {BG_HEARTS.map((h, i) => <BgHeart key={i} {...h} />)}
 
       <div className="absolute inset-0 pointer-events-none"
         style={{ background: 'radial-gradient(ellipse 60% 40% at 50% 50%, rgba(255,107,157,0.06) 0%, transparent 70%)' }} />
@@ -119,14 +148,18 @@ export default function Reasons() {
           <p className="font-playfair italic text-white/30 text-lg">{r.sub}</p>
         </motion.div>
 
-        {/* CSS columns masonry — photos fill naturally, no gaps */}
-        <div style={{ columns: '3 260px', columnGap: '6px' }}>
-          {PHOTOS.map((src, i) => (
-            <Photo key={i} src={src} index={i} />
-          ))}
+        {/* Photo grid with foreground hearts over it */}
+        <div className="relative">
+          {/* Foreground hearts — float over photos */}
+          {FG_HEARTS.map((h, i) => <FgHeart key={i} {...h} />)}
+
+          <div className="flex flex-wrap justify-center" style={{ gap: '5px' }}>
+            {PHOTOS.map((src, i) => (
+              <Polaroid key={i} src={src} rotation={ROTATIONS[i]} delay={i * 0.07} index={i} />
+            ))}
+          </div>
         </div>
 
-        {/* Note below photos */}
         <NoteBlock text={r.note} />
       </div>
     </section>
