@@ -21,7 +21,7 @@ export const t = {
   },
   letter: {
     label: 'a letter for you',
-    body: `You are one of those rare people\nwho make the world feel a little better.\nEvery day with you is a gift\nI never stop being grateful for.\n\nThank you for existing.\nThank you for being you.\nIm so proud of you\nMy le pussyiente!\n\nHappy Birthday, my dear girlfriend.\n\np.s See u soon!`,
+    body: `You are one of those rare people\nwho make the world feel a little better.\nEvery day with you is a gift\nI never stop being grateful for.\n\nThank you for existing.\nThank you for being you.\nIm so proud of you\nMy le pussyiente!\n\nHappy Birthday, my dear girlfriend.\n\np.s See u soon! We have a lot of plans ahead! Letsgooooo uy`,
     closing: 'with love',
   },
   finale: {

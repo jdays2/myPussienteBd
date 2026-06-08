@@ -80,10 +80,8 @@ export default function Hero() {
           style={{ fontSize: 'clamp(2.5rem, 8vw, 5rem)', color: '#fff' }}
         >
           <div>{h.titleLine1}</div>
-          <div>
-            {h.titleLine2}{' '}
-            <span className="text-gradient">{h.name}</span>
-          </div>
+          <div>{h.titleLine2}</div>
+          <div><span className="text-gradient">{h.name}</span></div>
         </motion.div>
 
         <motion.p
