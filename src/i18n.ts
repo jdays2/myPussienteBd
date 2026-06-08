@@ -11,6 +11,7 @@ export const t = {
     label: 'moments',
     title: 'Our Memories',
     captions: ['our moment', 'my favourite', 'you laughing', 'that day', 'to remember', 'always', 'just us', 'happy days', 'forever', 'i love you'],
+    quote: 'I want more and more moments with you.\nI want to cry with you, laugh with you,\nwatch all kinds of stupid stuff and travel together.\nMore to come — I can\'t wait!\nThank you for always being there for me. ♡',
   },
   reasons: {
     label: 'why',
