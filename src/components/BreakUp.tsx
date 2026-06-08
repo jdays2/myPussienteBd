@@ -3,9 +3,9 @@ import { motion, useInView, AnimatePresence } from 'framer-motion'
 import { useLang } from '../LangContext'
 
 const GHOSTS = [
-  'ахаха нет уж', 'не поймаешь 😏', 'вжух!', 'хихихи',
-  'попробуй ещё раз', 'я быстрее', 'нет-нет-нет', 'и не надейся',
-  'мимо~', 'слишком медленно', 'ха!', 'вжух и нету',
+  'haha nope', "can't catch me 😏", 'whoosh!', 'hehehehe',
+  'try again', "i'm faster", 'no no no', 'not a chance',
+  'miss~', 'too slow', 'ha!', 'gone!',
 ]
 
 const PAD_X  = 14   // % from sides

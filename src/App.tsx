@@ -1,16 +1,16 @@
 import { useEffect, useRef, useState, useCallback } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { LangProvider, useLang } from './LangContext'
+import { LangProvider } from './LangContext'
 import Hero from './components/Hero'
 import Gallery from './components/Gallery'
 import Reasons from './components/Reasons'
 import Letter from './components/Letter'
 import Finale from './components/Finale'
+import Goodbye from './components/Goodbye'
 import BreakUp from './components/BreakUp'
 import { playlist } from './playlist'
 
 function ControlBar() {
-  const { lang, toggle } = useLang()
   const audioRef = useRef<HTMLAudioElement>(null)
   const [volume, setVolume] = useState(0.35)
   const [muted, setMuted] = useState(false)
@@ -157,29 +157,6 @@ function ControlBar() {
           className="volume-slider"
         />
 
-        {/* Divider */}
-        <div className="w-px h-3.5 bg-white/15 mx-0.5" />
-
-        {/* Lang */}
-        <motion.button
-          onClick={toggle}
-          whileTap={{ scale: 0.9 }}
-          className="font-inter text-[11px] tracking-[0.2em] uppercase select-none"
-          style={{ color: 'rgba(255,255,255,0.5)', minWidth: '18px' }}
-        >
-          <AnimatePresence mode="wait">
-            <motion.span
-              key={lang}
-              initial={{ opacity: 0, y: 4 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -4 }}
-              transition={{ duration: 0.18 }}
-              className="block"
-            >
-              {lang === 'en' ? 'RU' : 'EN'}
-            </motion.span>
-          </AnimatePresence>
-        </motion.button>
       </motion.div>
     </>
   )
@@ -193,6 +170,7 @@ function Site() {
       <Reasons />
       <Letter />
       <Finale />
+      <Goodbye />
       <BreakUp />
       <ControlBar />
     </main>

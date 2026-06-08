@@ -77,7 +77,7 @@ export default function Hero() {
           initial={{ opacity: 0, scale: 0.92 }} animate={{ opacity: 1, scale: 1 }}
           transition={{ delay: 0.7, duration: 1.4, ease: [0.16, 1, 0.3, 1] }}
           className="font-dancing leading-tight mb-4 glow-pink"
-          style={{ fontSize: 'clamp(3.8rem, 13vw, 8.5rem)', color: '#fff' }}
+          style={{ fontSize: 'clamp(2.5rem, 8vw, 5rem)', color: '#fff' }}
         >
           <div>{h.titleLine1}</div>
           <div>
