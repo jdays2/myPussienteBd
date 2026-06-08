@@ -1,38 +1,74 @@
-import { useState, useRef } from 'react'
+import { useRef } from 'react'
 import { motion, useInView } from 'framer-motion'
 import { useLang } from '../LangContext'
 
-function FlipCard({ icon, num, back, delay }: { icon: string; num: string; back: string; delay: number }) {
-  const [flipped, setFlipped] = useState(false)
+const BASE = import.meta.env.BASE_URL
+
+const PHOTOS = [
+  { src: `${BASE}gallery/solo/photo_1_2026-06-08_18-45-35.jpg`,  span: 'row-span-2' },
+  { src: `${BASE}gallery/solo/photo_2_2026-06-08_18-45-35.jpg`,  span: 'row-span-1' },
+  { src: `${BASE}gallery/solo/photo_3_2026-06-08_18-45-35.jpg`,  span: 'row-span-1' },
+  { src: `${BASE}gallery/solo/photo_4_2026-06-08_18-45-35.jpg`,  span: 'row-span-2' },
+  { src: `${BASE}gallery/solo/photo_5_2026-06-08_18-45-35.jpg`,  span: 'row-span-1' },
+  { src: `${BASE}gallery/solo/photo_6_2026-06-08_18-45-35.jpg`,  span: 'row-span-1' },
+  { src: `${BASE}gallery/solo/photo_7_2026-06-08_18-45-35.jpg`,  span: 'row-span-2' },
+  { src: `${BASE}gallery/solo/photo_8_2026-06-08_18-45-35.jpg`,  span: 'row-span-1' },
+  { src: `${BASE}gallery/solo/photo_9_2026-06-08_18-45-35.jpg`,  span: 'row-span-1' },
+  { src: `${BASE}gallery/solo/photo_10_2026-06-08_18-45-35.jpg`, span: 'row-span-1' },
+  { src: `${BASE}gallery/solo/photo_11_2026-06-08_18-45-35.jpg`, span: 'row-span-1' },
+]
+
+// Floating hearts config
+const HEARTS = Array.from({ length: 18 }, (_, i) => ({
+  left: `${(i * 5.5 + Math.sin(i) * 8 + 4) % 96}%`,
+  size: 12 + (i % 4) * 8,
+  duration: 4 + (i % 5) * 1.2,
+  delay: (i * 0.4) % 5,
+  opacity: 0.12 + (i % 3) * 0.07,
+}))
+
+function FloatingHeart({ left, size, duration, delay, opacity }: typeof HEARTS[0]) {
+  return (
+    <motion.div
+      className="absolute pointer-events-none select-none"
+      style={{ left, bottom: '-10%', fontSize: size, opacity }}
+      animate={{ y: '-120vh', opacity: [opacity, opacity * 0.5, 0] }}
+      transition={{ duration, delay, repeat: Infinity, ease: 'easeOut' }}
+    >
+      ♡
+    </motion.div>
+  )
+}
+
+function Photo({ src, span, index }: { src: string; span: string; index: number }) {
   const ref = useRef(null)
-  const inView = useInView(ref, { once: true, margin: '-60px' })
-  const { t } = useLang()
+  const inView = useInView(ref, { once: true, margin: '-40px' })
 
   return (
     <motion.div
       ref={ref}
-      initial={{ opacity: 0, y: 40 }}
-      animate={inView ? { opacity: 1, y: 0 } : {}}
-      transition={{ duration: 0.7, delay }}
-      className="h-52 cursor-pointer"
-      style={{ perspective: 1000 }}
-      onClick={() => setFlipped((f) => !f)}
+      className={`relative overflow-hidden ${span}`}
+      initial={{ opacity: 0, scale: 0.92 }}
+      animate={inView ? { opacity: 1, scale: 1 } : {}}
+      transition={{ duration: 0.7, delay: index * 0.06, ease: [0.16, 1, 0.3, 1] }}
+      whileHover={{ scale: 1.03, transition: { duration: 0.2 } }}
+      style={{ borderRadius: '4px', minHeight: '160px' }}
     >
+      <img
+        src={src}
+        alt=""
+        className="w-full h-full object-cover"
+        loading="lazy"
+        style={{ display: 'block' }}
+      />
+      {/* Subtle pink glow on hover */}
       <motion.div
-        className="relative w-full h-full"
-        style={{ transformStyle: 'preserve-3d' }}
-        animate={{ rotateY: flipped ? 180 : 0 }}
-        transition={{ duration: 0.65, ease: [0.16, 1, 0.3, 1] }}
-      >
-        <div className="card-face absolute inset-0 glass rounded-2xl flex flex-col items-center justify-center gap-3" style={{ backfaceVisibility: 'hidden' }}>
-          <span className="text-3xl">{icon}</span>
-          <span className="font-playfair text-4xl font-bold" style={{ background: 'linear-gradient(135deg, rgba(255,255,255,0.15), rgba(255,255,255,0.05))', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>{num}</span>
-          <span className="text-white/20 text-[10px] tracking-[0.3em] uppercase">{t.reasons.hint.split(' ')[0]}</span>
-        </div>
-        <div className="card-face absolute inset-0 rounded-2xl flex items-center justify-center p-5 text-center" style={{ backfaceVisibility: 'hidden', transform: 'rotateY(180deg)', background: 'linear-gradient(135deg, rgba(255,107,157,0.18), rgba(255,208,96,0.10))', border: '1px solid rgba(255,107,157,0.25)' }}>
-          <p className="font-playfair italic text-white/90 text-base leading-relaxed">{back}</p>
-        </div>
-      </motion.div>
+        className="absolute inset-0 pointer-events-none"
+        initial={{ opacity: 0 }}
+        whileHover={{ opacity: 1 }}
+        transition={{ duration: 0.2 }}
+        style={{ background: 'linear-gradient(135deg, rgba(255,107,157,0.15), transparent)' }}
+      />
     </motion.div>
   )
 }
@@ -44,17 +80,34 @@ export default function Reasons() {
   const titleInView = useInView(titleRef, { once: true, margin: '-60px' })
 
   return (
-    <section className="py-28 px-6 relative" style={{ background: '#0d0d18' }}>
-      <div className="absolute inset-0 pointer-events-none" style={{ background: 'radial-gradient(ellipse 70% 40% at 50% 50%, rgba(255,107,157,0.04) 0%, transparent 70%)' }} />
-      <div className="max-w-4xl mx-auto relative z-10">
-        <motion.div ref={titleRef} initial={{ opacity: 0, y: 30 }} animate={titleInView ? { opacity: 1, y: 0 } : {}} transition={{ duration: 0.9 }} className="text-center mb-16">
+    <section className="py-28 px-6 relative overflow-hidden" style={{ background: '#0d0d18' }}>
+      {/* Floating hearts */}
+      {HEARTS.map((h, i) => <FloatingHeart key={i} {...h} />)}
+
+      {/* Glow */}
+      <div className="absolute inset-0 pointer-events-none"
+        style={{ background: 'radial-gradient(ellipse 60% 40% at 50% 50%, rgba(255,107,157,0.06) 0%, transparent 70%)' }} />
+
+      <div className="max-w-5xl mx-auto relative z-10">
+        <motion.div
+          ref={titleRef}
+          initial={{ opacity: 0, y: 30 }}
+          animate={titleInView ? { opacity: 1, y: 0 } : {}}
+          transition={{ duration: 0.9 }}
+          className="text-center mb-16"
+        >
           <p className="text-[#FF6B9D] text-xs tracking-[0.4em] uppercase mb-4">{r.label}</p>
-          <h2 className="font-playfair text-5xl md:text-6xl text-white mb-4">{r.title}</h2>
-          <p className="text-white/30 font-inter text-sm">{r.hint}</p>
+          <h2 className="font-playfair text-5xl md:text-6xl text-white mb-3">{r.title}</h2>
+          <p className="font-playfair italic text-white/30 text-lg">{r.sub}</p>
         </motion.div>
-        <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-          {r.items.map((back, i) => (
-            <FlipCard key={`${i}-${back}`} icon={r.icons[i]} num={`0${i + 1}`} back={back} delay={i * 0.08} />
+
+        {/* Masonry grid */}
+        <div
+          className="grid grid-cols-3 md:grid-cols-4 gap-2"
+          style={{ gridAutoRows: '160px' }}
+        >
+          {PHOTOS.map((p, i) => (
+            <Photo key={i} src={p.src} span={p.span} index={i} />
           ))}
         </div>
       </div>

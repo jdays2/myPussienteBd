@@ -14,18 +14,9 @@ export const t = {
     quote: 'I want more and more moments with you.\nI want to cry with you, laugh with you,\nwatch all kinds of stupid stuff and travel together.\nMore to come — I can\'t wait!\nThank you for always being there for me. ♡',
   },
   reasons: {
-    label: 'why',
-    title: 'I love you',
-    hint: 'flip each card',
-    icons: ['☀️', '😄', '🏠', '💪', '✨', '💕'],
-    items: [
-      'Your smile is the first thing I think about in the morning',
-      'You laugh at my jokes, even the bad ones',
-      'With you I feel at home, wherever we are',
-      'You are stronger than you think — and that amazes me every day',
-      'Your eyes are my favourite place in the world',
-      'Simply because you are you. That is enough',
-    ],
+    label: 'my girl',
+    title: 'She is everything',
+    sub: 'Every photo a reminder of how lucky I am',
   },
   letter: {
     label: 'a letter for you',
