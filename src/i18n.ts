@@ -10,7 +10,7 @@ export const t = {
   gallery: {
     label: 'moments',
     title: 'Our Memories',
-    captions: ['our moment', 'my favourite', 'you laughing', 'that day', 'to remember', 'always'],
+    captions: ['our moment', 'my favourite', 'you laughing', 'that day', 'to remember', 'always', 'just us', 'happy days', 'forever', 'i love you'],
   },
   reasons: {
     label: 'why',
