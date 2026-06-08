@@ -77,7 +77,7 @@ export default function Goodbye() {
           initial={{ opacity: 0 }}
           animate={inView ? { opacity: 1 } : {}}
           transition={{ duration: 1, delay: 0.85 }}
-          className="font-dancing text-[#FF6B9D] text-2xl md:text-3xl leading-relaxed max-w-lg"
+          className="font-playfair italic text-[#FF6B9D] text-xl md:text-2xl leading-relaxed max-w-lg"
           style={{ whiteSpace: 'pre-line', textShadow: '0 2px 24px rgba(0,0,0,0.9)' }}
         >
           {g.sub}
