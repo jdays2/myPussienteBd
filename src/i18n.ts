@@ -35,7 +35,7 @@ export const t = {
     label: '✦  today is your day  ✦',
     titleLine1: 'I love you,',
     accent: 'endlessly',
-    tagline: '— may this year be your best —',
+    tagline: '— Pls buy biggest cake every! Or just some Jollibee... —',
     button: '🎉 More confetti',
   },
   goodbye: {
