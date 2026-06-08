@@ -2,17 +2,19 @@ import { motion, useInView } from 'framer-motion'
 import { useRef } from 'react'
 import { useLang } from '../LangContext'
 
+const BASE = import.meta.env.BASE_URL
+
 const PHOTOS = [
-  '/gallery/us/photo_1_2026-06-08_18-44-49.jpg',
-  '/gallery/us/photo_2_2026-06-08_18-44-49.jpg',
-  '/gallery/us/photo_3_2026-06-08_18-44-49.jpg',
-  '/gallery/us/photo_4_2026-06-08_18-44-49.jpg',
-  '/gallery/us/photo_5_2026-06-08_18-44-49.jpg',
-  '/gallery/us/photo_6_2026-06-08_18-44-49.jpg',
-  '/gallery/us/photo_7_2026-06-08_18-44-49.jpg',
-  '/gallery/us/photo_8_2026-06-08_18-44-49.jpg',
-  '/gallery/us/photo_9_2026-06-08_18-44-49.jpg',
-  '/gallery/us/photo_10_2026-06-08_18-44-49.jpg',
+  `${BASE}gallery/us/photo_1_2026-06-08_18-44-49.jpg`,
+  `${BASE}gallery/us/photo_2_2026-06-08_18-44-49.jpg`,
+  `${BASE}gallery/us/photo_3_2026-06-08_18-44-49.jpg`,
+  `${BASE}gallery/us/photo_4_2026-06-08_18-44-49.jpg`,
+  `${BASE}gallery/us/photo_5_2026-06-08_18-44-49.jpg`,
+  `${BASE}gallery/us/photo_6_2026-06-08_18-44-49.jpg`,
+  `${BASE}gallery/us/photo_7_2026-06-08_18-44-49.jpg`,
+  `${BASE}gallery/us/photo_8_2026-06-08_18-44-49.jpg`,
+  `${BASE}gallery/us/photo_9_2026-06-08_18-44-49.jpg`,
+  `${BASE}gallery/us/photo_10_2026-06-08_18-44-49.jpg`,
 ]
 
 const ROTATIONS = [-3, 2, -1.5, 3, -2, 1.5, -2.5, 1, -1, 2.5]

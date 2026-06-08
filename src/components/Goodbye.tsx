@@ -28,7 +28,7 @@ export default function Goodbye() {
       {/* Video */}
       <video
         ref={videoRef}
-        src="/video/IMG_3610.MOV"
+        src={`${import.meta.env.BASE_URL}video/IMG_3610.MOV`}
         loop
         muted
         playsInline
