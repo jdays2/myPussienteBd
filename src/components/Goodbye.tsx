@@ -1,4 +1,4 @@
-import { useRef } from 'react'
+import { useRef, useEffect } from 'react'
 import { motion, useInView } from 'framer-motion'
 import { useLang } from '../LangContext'
 
@@ -6,7 +6,18 @@ export default function Goodbye() {
   const { t } = useLang()
   const g = t.goodbye
   const ref = useRef(null)
+  const videoRef = useRef<HTMLVideoElement>(null)
   const inView = useInView(ref, { once: true, margin: '-80px' })
+
+  useEffect(() => {
+    const video = videoRef.current
+    if (!video) return
+    if (inView) {
+      video.play().catch(() => {})
+    } else {
+      video.pause()
+    }
+  }, [inView])
 
   return (
     <section
@@ -16,8 +27,8 @@ export default function Goodbye() {
     >
       {/* Video */}
       <video
+        ref={videoRef}
         src="/video/IMG_3610.MOV"
-        autoPlay
         loop
         muted
         playsInline
