@@ -14,7 +14,7 @@ export const t = {
     quote: 'I want more and more moments with you.\nI want to cry with you, laugh with you,\nwatch all kinds of stupid stuff and travel together.\nMore to come — I can\'t wait!\nThank you for always being there for me. ♡',
   },
   reasons: {
-    label: 'my girl',
+    label: 'my ghurl',
     title: 'She is everything',
     sub: 'Every photo a reminder of how lucky I am',
   },

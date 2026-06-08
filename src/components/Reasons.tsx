@@ -5,34 +5,33 @@ import { useLang } from '../LangContext'
 const BASE = import.meta.env.BASE_URL
 
 const PHOTOS = [
-  { src: `${BASE}gallery/solo/photo_1_2026-06-08_18-45-35.jpg`,  span: 'row-span-2' },
-  { src: `${BASE}gallery/solo/photo_2_2026-06-08_18-45-35.jpg`,  span: 'row-span-1' },
-  { src: `${BASE}gallery/solo/photo_3_2026-06-08_18-45-35.jpg`,  span: 'row-span-1' },
-  { src: `${BASE}gallery/solo/photo_4_2026-06-08_18-45-35.jpg`,  span: 'row-span-2' },
-  { src: `${BASE}gallery/solo/photo_5_2026-06-08_18-45-35.jpg`,  span: 'row-span-1' },
-  { src: `${BASE}gallery/solo/photo_6_2026-06-08_18-45-35.jpg`,  span: 'row-span-1' },
-  { src: `${BASE}gallery/solo/photo_7_2026-06-08_18-45-35.jpg`,  span: 'row-span-2' },
-  { src: `${BASE}gallery/solo/photo_8_2026-06-08_18-45-35.jpg`,  span: 'row-span-1' },
-  { src: `${BASE}gallery/solo/photo_9_2026-06-08_18-45-35.jpg`,  span: 'row-span-1' },
-  { src: `${BASE}gallery/solo/photo_10_2026-06-08_18-45-35.jpg`, span: 'row-span-1' },
-  { src: `${BASE}gallery/solo/photo_11_2026-06-08_18-45-35.jpg`, span: 'row-span-1' },
+  `${BASE}gallery/solo/photo_1_2026-06-08_18-45-35.jpg`,
+  `${BASE}gallery/solo/photo_2_2026-06-08_18-45-35.jpg`,
+  `${BASE}gallery/solo/photo_3_2026-06-08_18-45-35.jpg`,
+  `${BASE}gallery/solo/photo_4_2026-06-08_18-45-35.jpg`,
+  `${BASE}gallery/solo/photo_5_2026-06-08_18-45-35.jpg`,
+  `${BASE}gallery/solo/photo_6_2026-06-08_18-45-35.jpg`,
+  `${BASE}gallery/solo/photo_7_2026-06-08_18-45-35.jpg`,
+  `${BASE}gallery/solo/photo_8_2026-06-08_18-45-35.jpg`,
+  `${BASE}gallery/solo/photo_9_2026-06-08_18-45-35.jpg`,
+  `${BASE}gallery/solo/photo_10_2026-06-08_18-45-35.jpg`,
+  `${BASE}gallery/solo/photo_11_2026-06-08_18-45-35.jpg`,
 ]
 
-// Floating hearts config
-const HEARTS = Array.from({ length: 18 }, (_, i) => ({
-  left: `${(i * 5.5 + Math.sin(i) * 8 + 4) % 96}%`,
-  size: 12 + (i % 4) * 8,
-  duration: 4 + (i % 5) * 1.2,
-  delay: (i * 0.4) % 5,
-  opacity: 0.12 + (i % 3) * 0.07,
+const HEARTS = Array.from({ length: 16 }, (_, i) => ({
+  left: `${(i * 6.2 + 3) % 95}%`,
+  size: 12 + (i % 4) * 7,
+  duration: 4.5 + (i % 5) * 1.2,
+  delay: (i * 0.45) % 5,
+  opacity: 0.10 + (i % 3) * 0.06,
 }))
 
 function FloatingHeart({ left, size, duration, delay, opacity }: typeof HEARTS[0]) {
   return (
     <motion.div
-      className="absolute pointer-events-none select-none"
-      style={{ left, bottom: '-10%', fontSize: size, opacity }}
-      animate={{ y: '-120vh', opacity: [opacity, opacity * 0.5, 0] }}
+      className="absolute pointer-events-none select-none text-[#FF6B9D]"
+      style={{ left, bottom: '-5%', fontSize: size, opacity }}
+      animate={{ y: '-115vh', opacity: [opacity, opacity * 0.4, 0] }}
       transition={{ duration, delay, repeat: Infinity, ease: 'easeOut' }}
     >
       ♡
@@ -40,34 +39,31 @@ function FloatingHeart({ left, size, duration, delay, opacity }: typeof HEARTS[0
   )
 }
 
-function Photo({ src, span, index }: { src: string; span: string; index: number }) {
+function Photo({ src, index }: { src: string; index: number }) {
   const ref = useRef(null)
   const inView = useInView(ref, { once: true, margin: '-40px' })
 
   return (
     <motion.div
       ref={ref}
-      className={`relative overflow-hidden ${span}`}
-      initial={{ opacity: 0, scale: 0.92 }}
-      animate={inView ? { opacity: 1, scale: 1 } : {}}
-      transition={{ duration: 0.7, delay: index * 0.06, ease: [0.16, 1, 0.3, 1] }}
+      initial={{ opacity: 0, y: 24 }}
+      animate={inView ? { opacity: 1, y: 0 } : {}}
+      transition={{ duration: 0.65, delay: index * 0.05, ease: [0.16, 1, 0.3, 1] }}
       whileHover={{ scale: 1.03, transition: { duration: 0.2 } }}
-      style={{ borderRadius: '4px', minHeight: '160px' }}
+      style={{ breakInside: 'avoid', marginBottom: '6px', display: 'block', borderRadius: '4px', overflow: 'hidden' }}
     >
       <img
         src={src}
         alt=""
-        className="w-full h-full object-cover"
         loading="lazy"
-        style={{ display: 'block' }}
+        style={{ width: '100%', display: 'block' }}
       />
-      {/* Subtle pink glow on hover */}
       <motion.div
         className="absolute inset-0 pointer-events-none"
         initial={{ opacity: 0 }}
         whileHover={{ opacity: 1 }}
         transition={{ duration: 0.2 }}
-        style={{ background: 'linear-gradient(135deg, rgba(255,107,157,0.15), transparent)' }}
+        style={{ background: 'linear-gradient(135deg, rgba(255,107,157,0.12), transparent)', position: 'absolute', inset: 0 }}
       />
     </motion.div>
   )
@@ -81,10 +77,8 @@ export default function Reasons() {
 
   return (
     <section className="py-28 px-6 relative overflow-hidden" style={{ background: '#0d0d18' }}>
-      {/* Floating hearts */}
       {HEARTS.map((h, i) => <FloatingHeart key={i} {...h} />)}
 
-      {/* Glow */}
       <div className="absolute inset-0 pointer-events-none"
         style={{ background: 'radial-gradient(ellipse 60% 40% at 50% 50%, rgba(255,107,157,0.06) 0%, transparent 70%)' }} />
 
@@ -101,13 +95,10 @@ export default function Reasons() {
           <p className="font-playfair italic text-white/30 text-lg">{r.sub}</p>
         </motion.div>
 
-        {/* Masonry grid */}
-        <div
-          className="grid grid-cols-3 md:grid-cols-4 gap-2"
-          style={{ gridAutoRows: '160px' }}
-        >
-          {PHOTOS.map((p, i) => (
-            <Photo key={i} src={p.src} span={p.span} index={i} />
+        {/* CSS columns masonry — photos fill naturally, no gaps */}
+        <div style={{ columns: '3 260px', columnGap: '6px' }}>
+          {PHOTOS.map((src, i) => (
+            <Photo key={i} src={src} index={i} />
           ))}
         </div>
       </div>
