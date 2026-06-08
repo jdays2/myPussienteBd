@@ -67,25 +67,24 @@ function Photo({ src, index }: { src: string; index: number }) {
   return (
     <motion.div
       ref={ref}
-      initial={{ opacity: 0, y: 20, scale: 0.96 }}
-      animate={inView ? { opacity: 1, y: 0, scale: 1 } : {}}
-      transition={{ duration: 0.65, delay: index * 0.06, ease: [0.16, 1, 0.3, 1] }}
-      whileHover={{ scale: 1.04, transition: { duration: 0.2 } }}
+      initial={{ opacity: 0, scale: 0.88 }}
+      animate={inView ? { opacity: 1, scale: 1 } : {}}
+      transition={{ duration: 0.55, delay: index * 0.07, ease: [0.16, 1, 0.3, 1] }}
+      whileHover={{ scale: 1.06, transition: { duration: 0.18 } }}
       style={{
-        breakInside: 'avoid',
-        marginBottom: '10px',
-        display: 'block',
-        borderRadius: '10px',
+        borderRadius: '12px',
         overflow: 'hidden',
-        boxShadow: '0 4px 24px rgba(255,107,157,0.15), 0 2px 8px rgba(0,0,0,0.4)',
-        border: '2px solid rgba(255,180,210,0.18)',
+        aspectRatio: '1 / 1',
+        boxShadow: '0 4px 20px rgba(255,107,157,0.18), 0 2px 8px rgba(0,0,0,0.45)',
+        border: '1.5px solid rgba(255,180,210,0.2)',
+        cursor: 'pointer',
       }}
     >
       <img
         src={src}
         alt=""
         loading="lazy"
-        style={{ width: '100%', display: 'block' }}
+        style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
       />
     </motion.div>
   )
@@ -138,9 +137,9 @@ export default function Reasons() {
           <p className="font-playfair italic text-white/30 text-lg">{r.sub}</p>
         </motion.div>
 
-        {/* Masonry — natural aspect ratios, warm framed */}
-        <div style={{ columns: '3 220px', columnGap: '10px' }}>
-          {PHOTOS.map((src, i) => <Photo key={i} src={src} index={i} />)}
+        {/* 2 rows × 5 photos */}
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: '10px' }}>
+          {PHOTOS.slice(0, 10).map((src, i) => <Photo key={i} src={src} index={i} />)}
         </div>
 
         <NoteBlock text={r.note} />
