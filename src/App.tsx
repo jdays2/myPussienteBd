@@ -21,7 +21,7 @@ const ls = {
   },
 }
 
-function ControlBar({ audioRef }: { audioRef: React.RefObject<HTMLAudioElement> }) {
+function ControlBar({ audioRef }: { audioRef: React.RefObject<HTMLAudioElement | null> }) {
   const [volume,   setVolume]   = useState(() => ls.get('bd_volume',   0.35))
   const [muted,    setMuted]    = useState(() => ls.get('bd_muted',    false))
   const [trackIdx, setTrackIdx] = useState(() => ls.get('bd_track',    0))
@@ -238,7 +238,7 @@ function Splash({ onEnter }: { onEnter: () => void }) {
   )
 }
 
-function Site({ audioRef }: { audioRef: React.RefObject<HTMLAudioElement> }) {
+function Site({ audioRef }: { audioRef: React.RefObject<HTMLAudioElement | null> }) {
   return (
     <main>
       <Hero />
