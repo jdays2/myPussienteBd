@@ -77,11 +77,9 @@ export default function Hero() {
           initial={{ opacity: 0, scale: 0.92 }} animate={{ opacity: 1, scale: 1 }}
           transition={{ delay: 0.7, duration: 1.4, ease: [0.16, 1, 0.3, 1] }}
           className="font-dancing leading-tight mb-4 glow-pink"
-          style={{ fontSize: 'clamp(2.5rem, 8vw, 5rem)', color: '#fff' }}
+          style={{ fontSize: 'clamp(2.5rem, 8vw, 5rem)', color: '#fff', width: '100%', display: 'block' }}
         >
-          <div>{h.titleLine1}</div>
-          <div>{h.titleLine2}</div>
-          <div><span className="text-gradient">{h.name}</span></div>
+          {h.titleLine1} {h.titleLine2} <span className="text-gradient font-playfair italic">{h.name}</span>
         </motion.div>
 
         <motion.p
