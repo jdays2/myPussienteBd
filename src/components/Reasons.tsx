@@ -18,84 +18,75 @@ const PHOTOS = [
   `${BASE}gallery/solo/photo_11_2026-06-08_18-45-35.jpg`,
 ]
 
-const ROTATIONS = [-3, 1.5, -2, 2.5, -1, 3, -2.5, 1, -1.5, 2, -0.5]
+// Hearts scattered around all 4 edges — warm pink palette
+const EDGE_HEARTS = [
+  // top edge
+  { x:'4%',  y:'2%',  s:22, c:'#FF6B9D', d:3.2, delay:0    },
+  { x:'14%', y:'1%',  s:14, c:'#FFB3CC', d:2.8, delay:0.4  },
+  { x:'27%', y:'3%',  s:18, c:'#FF8CB8', d:3.5, delay:0.8  },
+  { x:'41%', y:'1%',  s:12, c:'#FFD4E8', d:2.5, delay:0.2  },
+  { x:'55%', y:'3%',  s:20, c:'#FF4D6D', d:3.8, delay:0.6  },
+  { x:'68%', y:'1%',  s:16, c:'#FF9A8B', d:3.0, delay:1.0  },
+  { x:'80%', y:'2%',  s:24, c:'#FFB3CC', d:2.6, delay:0.3  },
+  { x:'92%', y:'1%',  s:13, c:'#FF6B9D', d:3.3, delay:0.7  },
+  // bottom edge
+  { x:'6%',  y:'92%', s:18, c:'#FF8CB8', d:2.9, delay:0.5  },
+  { x:'19%', y:'94%', s:22, c:'#FF6B9D', d:3.6, delay:0.1  },
+  { x:'33%', y:'92%', s:14, c:'#FFD4E8', d:2.7, delay:0.9  },
+  { x:'47%', y:'94%', s:20, c:'#FF4D6D', d:3.1, delay:0.4  },
+  { x:'61%', y:'92%', s:16, c:'#FFB3CC', d:2.4, delay:0.8  },
+  { x:'74%', y:'94%', s:12, c:'#FF9A8B', d:3.4, delay:0.2  },
+  { x:'87%', y:'93%', s:24, c:'#FF6B9D', d:3.0, delay:0.6  },
+  // left edge
+  { x:'1%',  y:'20%', s:16, c:'#FFB3CC', d:3.2, delay:0.3  },
+  { x:'2%',  y:'38%', s:22, c:'#FF6B9D', d:2.8, delay:0.7  },
+  { x:'1%',  y:'56%', s:14, c:'#FF9A8B', d:3.5, delay:0.1  },
+  { x:'2%',  y:'74%', s:20, c:'#FFD4E8', d:3.0, delay:0.5  },
+  // right edge
+  { x:'96%', y:'18%', s:20, c:'#FF4D6D', d:2.6, delay:0.4  },
+  { x:'95%', y:'36%', s:14, c:'#FFB3CC', d:3.3, delay:0.8  },
+  { x:'96%', y:'54%', s:24, c:'#FF6B9D', d:2.9, delay:0.2  },
+  { x:'95%', y:'72%', s:16, c:'#FF8CB8', d:3.6, delay:0.6  },
+]
 
-// Background hearts — rise from bottom, behind photos
-const BG_HEARTS = Array.from({ length: 14 }, (_, i) => ({
-  left: `${(i * 7.1 + 3) % 95}%`,
-  size: 10 + (i % 4) * 6,
-  duration: 5 + (i % 5) * 1.3,
-  delay: (i * 0.5) % 5,
-  opacity: 0.08 + (i % 3) * 0.05,
-}))
-
-// Foreground hearts — float over the grid, more visible
-const FG_HEARTS = Array.from({ length: 8 }, (_, i) => ({
-  left: `${10 + i * 11}%`,
-  top: `${25 + (i % 3) * 22}%`,
-  size: 14 + (i % 3) * 8,
-  duration: 3 + (i % 4) * 0.8,
-  delay: i * 0.6,
-  opacity: 0.18 + (i % 3) * 0.08,
-}))
-
-function BgHeart({ left, size, duration, delay, opacity }: typeof BG_HEARTS[0]) {
+function EdgeHeart({ x, y, s, c, d, delay }: typeof EDGE_HEARTS[0]) {
   return (
-    <motion.div
-      className="absolute pointer-events-none select-none text-[#FF6B9D]"
-      style={{ left, bottom: '-5%', fontSize: size, opacity, zIndex: 0 }}
-      animate={{ y: '-115vh', opacity: [opacity, opacity * 0.4, 0] }}
-      transition={{ duration, delay, repeat: Infinity, ease: 'easeOut' }}
-    >♡</motion.div>
+    <motion.span
+      className="absolute pointer-events-none select-none"
+      style={{ left: x, top: y, fontSize: s, color: c, lineHeight: 1 }}
+      animate={{ scale: [1, 1.25, 1], opacity: [0.55, 0.9, 0.55] }}
+      transition={{ duration: d, delay, repeat: Infinity, ease: 'easeInOut' }}
+    >♡</motion.span>
   )
 }
 
-function FgHeart({ left, top, size, duration, delay, opacity }: typeof FG_HEARTS[0]) {
-  return (
-    <motion.div
-      className="absolute pointer-events-none select-none text-[#FF6B9D]"
-      style={{ left, top, fontSize: size, zIndex: 20 }}
-      animate={{
-        y: [0, -18, 0],
-        opacity: [opacity, opacity * 1.4, opacity],
-        scale: [1, 1.15, 1],
-      }}
-      transition={{ duration, delay, repeat: Infinity, ease: 'easeInOut' }}
-    >♡</motion.div>
-  )
-}
-
-function Polaroid({ src, rotation, delay, index }: {
-  src: string; rotation: number; delay: number; index: number
-}) {
+function Photo({ src, index }: { src: string; index: number }) {
   const ref = useRef(null)
-  const inView = useInView(ref, { once: true, margin: '-60px' })
-  const fromX = index % 2 === 0 ? -30 : 30
+  const inView = useInView(ref, { once: true, margin: '-40px' })
 
   return (
     <motion.div
       ref={ref}
-      variants={{
-        hidden:  { opacity: 0, y: 36, x: fromX, rotate: rotation - 4 },
-        visible: { opacity: 1, y: 0, x: 0, rotate: rotation,
-                   transition: { duration: 0.7, delay, ease: [0.16, 1, 0.3, 1] } },
-        hover:   { scale: 1.1, rotate: 0,
-                   transition: { duration: 0.18, ease: 'easeOut' } },
+      initial={{ opacity: 0, y: 20, scale: 0.96 }}
+      animate={inView ? { opacity: 1, y: 0, scale: 1 } : {}}
+      transition={{ duration: 0.65, delay: index * 0.06, ease: [0.16, 1, 0.3, 1] }}
+      whileHover={{ scale: 1.04, transition: { duration: 0.2 } }}
+      style={{
+        breakInside: 'avoid',
+        marginBottom: '10px',
+        display: 'block',
+        borderRadius: '10px',
+        overflow: 'hidden',
+        boxShadow: '0 4px 24px rgba(255,107,157,0.15), 0 2px 8px rgba(0,0,0,0.4)',
+        border: '2px solid rgba(255,180,210,0.18)',
       }}
-      initial="hidden"
-      animate={inView ? 'visible' : 'hidden'}
-      whileHover="hover"
-      className="cursor-pointer relative z-10"
-      style={{ transformOrigin: 'center center' }}
     >
-      <div
-        className="bg-white"
-        style={{ padding: '7px', boxShadow: '0 6px 28px rgba(0,0,0,0.55), 0 0 0 1px rgba(255,255,255,0.06)' }}
-      >
-        <div className="w-36 h-40 overflow-hidden">
-          <img src={src} alt="" className="w-full h-full object-cover" loading="lazy" />
-        </div>
-      </div>
+      <img
+        src={src}
+        alt=""
+        loading="lazy"
+        style={{ width: '100%', display: 'block' }}
+      />
     </motion.div>
   )
 }
@@ -103,7 +94,6 @@ function Polaroid({ src, rotation, delay, index }: {
 function NoteBlock({ text }: { text: string }) {
   const ref = useRef(null)
   const inView = useInView(ref, { once: true, margin: '-60px' })
-
   return (
     <motion.div
       ref={ref}
@@ -114,8 +104,7 @@ function NoteBlock({ text }: { text: string }) {
     >
       <div className="w-12 h-px bg-white/10 mx-auto mb-8" />
       <p className="font-playfair italic text-white/60 text-lg md:text-xl leading-relaxed"
-        style={{ whiteSpace: 'pre-line' }}
-      >{text}</p>
+        style={{ whiteSpace: 'pre-line' }}>{text}</p>
       <div className="w-12 h-px bg-white/10 mx-auto mt-8" />
     </motion.div>
   )
@@ -128,12 +117,13 @@ export default function Reasons() {
   const titleInView = useInView(titleRef, { once: true, margin: '-60px' })
 
   return (
-    <section className="py-28 px-6 relative overflow-hidden" style={{ background: '#0d0d18' }}>
-      {/* Background hearts — behind everything */}
-      {BG_HEARTS.map((h, i) => <BgHeart key={i} {...h} />)}
+    <section className="py-28 px-8 relative overflow-hidden" style={{ background: '#0d0d18' }}>
+      {/* Hearts around all edges */}
+      {EDGE_HEARTS.map((h, i) => <EdgeHeart key={i} {...h} />)}
 
+      {/* Warm glow */}
       <div className="absolute inset-0 pointer-events-none"
-        style={{ background: 'radial-gradient(ellipse 60% 40% at 50% 50%, rgba(255,107,157,0.06) 0%, transparent 70%)' }} />
+        style={{ background: 'radial-gradient(ellipse 70% 50% at 50% 50%, rgba(255,107,157,0.07) 0%, transparent 70%)' }} />
 
       <div className="max-w-5xl mx-auto relative z-10">
         <motion.div
@@ -148,16 +138,9 @@ export default function Reasons() {
           <p className="font-playfair italic text-white/30 text-lg">{r.sub}</p>
         </motion.div>
 
-        {/* Photo grid with foreground hearts over it */}
-        <div className="relative">
-          {/* Foreground hearts — float over photos */}
-          {FG_HEARTS.map((h, i) => <FgHeart key={i} {...h} />)}
-
-          <div className="flex flex-wrap justify-center" style={{ gap: '5px' }}>
-            {PHOTOS.map((src, i) => (
-              <Polaroid key={i} src={src} rotation={ROTATIONS[i]} delay={i * 0.07} index={i} />
-            ))}
-          </div>
+        {/* Masonry — natural aspect ratios, warm framed */}
+        <div style={{ columns: '3 220px', columnGap: '10px' }}>
+          {PHOTOS.map((src, i) => <Photo key={i} src={src} index={i} />)}
         </div>
 
         <NoteBlock text={r.note} />
